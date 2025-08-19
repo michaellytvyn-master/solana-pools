@@ -9,11 +9,16 @@ import { useEffect, useRef, useState } from "react"
 
 type CoinImage = { large?: string; small?: string; thumb?: string }
 type Coin = {
+  last: number
   id: string
   name: string
   symbol: string
   image?: CoinImage
-  market_data?: { market_cap?: { usd?: number } }
+  categories	?: string[]
+  market_data?: { 
+    market_cap?: { usd?: number }
+    current_price?: { usd?: number }
+  }
 }
 type RaydiumInfo = {
   priceUsd?: string | number
@@ -121,6 +126,27 @@ export default function TokenPage() {
                     : coin.market_data?.market_cap?.usd
                     ? `$${coin.market_data.market_cap.usd.toLocaleString()}`
                     : "N/A"}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Current price</TableCell>
+                <TableCell>
+                  {coin && coin?.market_data?.current_price && coin?.market_data?.current_price.usd
+                    ? `$${coin.market_data.current_price.usd.toLocaleString()}`
+                    : "N/A"}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Categories</TableCell>
+                <TableCell>
+                  {coin?.categories && coin?.categories.map((category) => {
+                    return (
+                      <div key={category}>
+                        {category}
+                      </div>
+                    )
+                  })
+                  }
                 </TableCell>
               </TableRow>
             </TableBody>
