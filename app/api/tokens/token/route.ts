@@ -62,12 +62,13 @@ export async function GET(request: Request) {
 
     let raydiumInfo = null
     try {
-      const mintForRaydium = isNativeSOL ? WSOL_MINT.toBase58() : splMintStr
-      const r = await fetch(`https://api.raydium.io/v2/sdk/token/${mintForRaydium}`)
-      if (r.ok) {
-        const data = await r.json()
+      const mint = isNativeSOL ? WSOL_MINT.toBase58() : splMintStr;
+      const radiumRes = await fetch(`https://api-v3.raydium.io/mint/price?mints=${mint}`)
+      if (radiumRes.ok) {
+        const {data} = await radiumRes.json()
+        console.log('data',data)
         if (data && data !== false) {
-          raydiumInfo = data
+          raydiumInfo = data[mint] || null
         }
       }
     } catch (err) {
@@ -77,8 +78,6 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         coin,
-        isNativeSOL,
-        mint: isNativeSOL ? WSOL_MINT.toBase58() : splMintStr || null,
         supplyInfo,
         raydiumInfo
       },

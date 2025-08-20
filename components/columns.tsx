@@ -42,7 +42,7 @@ export const columns: ColumnDef<Token>[] = [
   {
     accessorKey: "current_price",
     header: "Price (USD)",
-    cell: ({ row }) => `$${row.original.current_price.toLocaleString()}`,
+    cell: ({ row }) => `$${row.original.current_price.toFixed(10)}`,
   },
   {
     accessorKey: "market_cap",
