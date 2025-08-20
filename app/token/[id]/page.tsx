@@ -45,7 +45,7 @@ export default function TokenPage() {
   return (
     <main className="container mx-auto p-6">
       <div className="flex justify-center w-full">
-        <Card className="p-6 w-full max-w-xl">
+        <Card className="p-2 md:p-6 w-full max-w-xl">
           <CardHeader className="flex items-center space-x-4">
             {coin.image?.large && (
               <Image

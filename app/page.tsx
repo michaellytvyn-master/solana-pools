@@ -3,8 +3,11 @@
 import { columns, Token } from "@/components/columns"
 import { TokensTable } from "@/components/tokens-table"
 import { Button } from "@/components/ui/button"
+import axios from "axios"
 import { Loader2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
+
+const REFRESH_MS = 60_000
 
 export default function HomePage() {
   const [tokens, setTokens] = useState<Token[]>([])
@@ -12,12 +15,13 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const firstLoad = useRef(true)
+  const [nextRefreshAt, setNextRefreshAt] = useState<number | null>(null)
+  const [secondsLeft, setSecondsLeft] = useState<number>(60)
 
   const fetchTokens = async (pageNumber: number) => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/tokens?page=${pageNumber}`)
-      const data = await res.json()
+      const { data } = await axios.get<Token[]>("/api/tokens", { params: { page: pageNumber } })
       setTokens(data)
     } catch (err) {
       console.error("Error fetching tokens", err)
@@ -29,10 +33,31 @@ export default function HomePage() {
   }
 
   useEffect(() => {
-    fetchTokens(page)
-    const interval = setInterval(() => fetchTokens(page), 60000)
-    return () => clearInterval(interval)
+    const run = () => {
+      setNextRefreshAt(Date.now() + REFRESH_MS)
+      fetchTokens(page)
+    }
+
+    run() 
+    const intervalId = setInterval(run, REFRESH_MS)
+    return () => clearInterval(intervalId)
   }, [page])
+
+  useEffect(() => {
+    if (!nextRefreshAt) return
+    const id = setInterval(() => {
+      const diffMs = nextRefreshAt - Date.now()
+      const secs = Math.max(0, Math.ceil(diffMs / 1000))
+      setSecondsLeft(secs)
+    }, 1000)
+    return () => clearInterval(id)
+  }, [nextRefreshAt])
+
+  const formatSeconds = (s: number) => {
+    const mm = Math.floor(s / 60)
+    const ss = s % 60
+    return `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`
+  }
 
   if(error) {
     return (
@@ -45,8 +70,11 @@ export default function HomePage() {
 
   return (
     <main className="container mx-auto p-6 space-y-4">
-      <div className='flex items-center justify-between'>
-        <h1 className="text-2xl font-bold">🔥 Trending Solana Pools</h1>
+      <div className='flex items-center justify-between flex-col md:flex-row'>
+        <h1 className="text-xl font-bold">🔥 Trending Solana Pools</h1>
+          <p className="text-xs text-muted-foreground">
+            Next refresh in <span className="font-mono">{formatSeconds(secondsLeft)}</span>
+          </p>
         <span className="text-sm font-medium">Page {page}</span>
       </div>
       {loading && firstLoad.current ? (

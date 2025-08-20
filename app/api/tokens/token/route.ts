@@ -66,7 +66,6 @@ export async function GET(request: Request) {
       const radiumRes = await fetch(`https://api-v3.raydium.io/mint/price?mints=${mint}`)
       if (radiumRes.ok) {
         const {data} = await radiumRes.json()
-        console.log('data',data)
         if (data && data !== false) {
           raydiumInfo = data[mint] || null
         }
