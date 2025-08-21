@@ -10,11 +10,11 @@ A tiny app built with **Next.js (App Router)** and **shadcn/ui** that shows tren
 ## Features
 
 - **Trending Solana pools** from CoinGecko (≥ 20 rows)
+- **Pagination** on the home page
 - **Token Pool page** with:
   - name, symbol, image, **total supply** (via Solana RPC)
   - **price & market cap** (via Raydium API — see https://api-v3.raydium.io/docs/)
 - **Auto-refresh every 60s** (home & token pages)
-- **Pagination** on the home page
 - **Visible 60s countdown timer** on the home page
 - Accessible UI with **shadcn/ui Data Table**
 - Type-safe with **TypeScript**
@@ -30,6 +30,10 @@ A tiny app built with **Next.js (App Router)** and **shadcn/ui** that shows tren
 
 ---
 
+## Environment Variables
+
+Add `.env.local` file, use `.env.local.example` as a template
+
 ## Quick Start
 
 ```bash
@@ -42,3 +46,13 @@ npm run dev
 
 # 3) Open the app
 http://localhost:3000
+```
+
+## Quick Start with Docker
+
+```bash
+# Build the image
+docker build --no-cache -t solana-pool-next .
+# Run the container with environment variables
+docker run --rm -p 3000:3000 --env-file .env.local solana-pool-next
+```
