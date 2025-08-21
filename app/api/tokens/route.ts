@@ -1,21 +1,27 @@
+import { getTokens } from '@/lib/getTokens'
+import axios from "axios"
 import { NextResponse } from "next/server"
+
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const page = searchParams.get("page") || "1"
+  const page = Number(searchParams.get("page") ?? "1") || 1
 
   try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=solana-ecosystem&order=market_cap_desc&per_page=20&page=${page}&sparkline=false&x_cg_demo_api_key=${process.env.COIN_GECKO_API_KEY}`
-    )
-
-    if (!res.ok) {
-      return NextResponse.json({ error: "Failed to fetch from CoinGecko" }, { status: 500 })
-    }
-
-    const data = await res.json()
+    const data = await getTokens(page)
     return NextResponse.json(data)
   } catch (err) {
-    return NextResponse.json({ error: "Server error", message: err }, { status: 500 })
+    const isAxios = axios.isAxiosError(err)
+    const status = isAxios ? err.response?.status ?? 500 : 500
+    const message = isAxios
+      ? (typeof err.response?.data === "string" ? err.response.data : err.message)
+      : (err as Error).message
+
+    return NextResponse.json(
+      { error: "Failed to fetch from CoinGecko", message },
+      { status }
+    )
   }
 }

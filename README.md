@@ -23,7 +23,7 @@ A tiny app built with **Next.js (App Router)** and **shadcn/ui** that shows tren
 
 ## Data Fetching & Architecture
 
-- **Home page (trending list):** classic **client-side fetch** using `axios` in a client component.
+- **Home page (trending list):** classic **SSR** with metadata (title, description, openGraph, canonical, twitter) and **client-side fetch** using `axios` in a client component with pagination with a `refreshInterval` of 60s to keep data fresh.
 - **Token page (details):** uses **SWR** (stale-while-revalidate) with a `refreshInterval` of 60s to keep data fresh.
 - **API proxying:** all frontend calls go through **internal Next.js API routes** (`/api/*`).  
   External requests (CoinGecko, Raydium, Solana RPC) are made **server-side** to keep API keys in environment variables and **avoid exposing `NEXT_PUBLIC_*` keys** in the browser.
@@ -50,9 +50,9 @@ http://localhost:3000
 
 ## Quick Start with Docker
 
+Add `.env.local` file before
+
 ```bash
-# Build the image
 docker build --no-cache -t solana-pool-next .
-# Run the container with environment variables
 docker run --rm -p 3000:3000 --env-file .env.local solana-pool-next
 ```
